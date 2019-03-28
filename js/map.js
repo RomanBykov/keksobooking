@@ -11,6 +11,18 @@ var formHeader = noticeForm.querySelector('.notice__header');
 var mapFiltersForm = document.querySelector('.map__filters');
 var mapFilters = mapFiltersForm.querySelectorAll('.map__filter');
 var mainPin = document.querySelector('.map__pin--main');
+var formTimeIn = noticeForm.querySelector('#timein');
+var formTitle = noticeForm.querySelector('#title');
+var formTimeOut = noticeForm.querySelector('#timeout');
+var formType = noticeForm.querySelector('#type');
+var formTypeOptions = Array.from(formType.querySelectorAll('option'));
+var formPrice = noticeForm.querySelector('#price');
+var formRoomNumber = noticeForm.querySelector('#room_number');
+// var formCapacity = noticeForm.querySelector('#capacity');
+var formAddress = noticeForm.querySelector('#address');
+var roomNumberValues = Array.from(noticeForm.querySelectorAll('#room_number option'));
+var capacityValues = Array.from(noticeForm.querySelectorAll('#capacity option'));
+var prices = [1000, 0, 5000, 10000];
 var toggledFormElements = [formElements, mapFilters, formHeader];
 var OFFER_DESCRIPTION = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var CHECKS_TIMES = ['12:00', '13:00', '14:00'];
@@ -36,6 +48,7 @@ var getRandomNumber = function (minNumber, maxNumber) {
   return Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber;
 };
 
+// вариация тасования по алгоритму Фишера-Йетса
 var shuffle = function (array) {
   var j;
   var temp;
@@ -61,28 +74,32 @@ var getOfferType = function (type) {
 
 var createCards = function (cardsArray, quantity) {
   var housingTypesKeys = Object.keys(HOUSING_TYPES);
+  var checkTimes = CHECKS_TIMES[getRandomNumber(0, CHECKS_TIMES.length)];
 
   for (var i = 0; i < quantity; i++) {
+    var locationX = getRandomNumber(320, 920);
+    var locationY = getRandomNumber(120, 520);
+
     cardsArray[i] = {
       author: {
         avatar: 'img/avatars/user0' + (1 + i) + '.png'
       },
       offer: {
         title: OFFER_DESCRIPTION[i],
-        address: getRandomNumber(320, 920) + ', ' + getRandomNumber(120, 520),
+        address: locationX + ', ' + locationY,
         price: getRandomNumber(MIN_PRICE, MAX_PRICE),
         type: housingTypesKeys,
         rooms: getRandomNumber(MIN_ROOMS, MAX_ROOMS),
         guests: getRandomNumber(MIN_GUESTS, MAX_GUESTS),
-        checkin: CHECKS_TIMES[getRandomNumber(0, CHECKS_TIMES.length)],
-        checkout: CHECKS_TIMES[getRandomNumber(0, CHECKS_TIMES.length)],
+        checkin: checkTimes,
+        checkout: checkTimes,
         features: getRandomFeatures(OFFER_FEATURES),
         description: '',
         photos: []
       },
       location: {
-        x: getRandomNumber(320, 920),
-        y: getRandomNumber(120, 520)
+        x: locationX,
+        y: locationY
       }
     };
   }
@@ -207,6 +224,7 @@ var activateMap = function () {
   toggledFormElements.forEach(function (element) {
     toggleElementsVisibility(element);
   });
+  setDefaultAddress();
 };
 
 // очищает пины от активного маркера
@@ -283,7 +301,83 @@ var addCloseClickHandlers = function () {
   }
 };
 
+// module4-task2
+var formTimeChangeHandler = function () {
+  formTimeOut.value = formTimeIn.value;
+};
+
+// считываем css свойства top И left, чтобы определить позицию главного пина
+var getMainPinLocation = function () {
+  var MAIN_PIN_Y_OFFSET = 16;
+  var mainPinLocationY = parseInt(getComputedStyle(mainPin).getPropertyValue('top'), 10) - MAIN_PIN_Y_OFFSET;
+  var mainPinLocationX = parseInt(getComputedStyle(mainPin).getPropertyValue('left'), 10);
+  return 'x: ' + mainPinLocationX + ', y: ' + mainPinLocationY;
+};
+
+var setDefaultAddress = function () {
+  formAddress.value = getMainPinLocation();
+  formAddress.placeholder = getMainPinLocation();
+};
+
+var changeFormPrice = function (price) {
+  formPrice.min = price;
+  formPrice.placeholder = price;
+};
+
+var formTypeChangeHandler = function () {
+  for (var i = 0; i < formTypeOptions.length; i++) {
+    if (formTypeOptions[i].selected) {
+      changeFormPrice(prices[i]);
+    }
+  }
+};
+
+var syncCapacityWithRooms = function () {
+  for (var i = 0; i < roomNumberValues.length; i++) { // в цикле по комнатам находим выбранное количество комнат
+    if (roomNumberValues[i].selected) {
+      for (var j = 0; j < capacityValues.length; j++) { // в цикле по количествам гостей на комнаты проверяем совпадения с комнатами
+        if (capacityValues[j].value === roomNumberValues[i].value) { // если значение количества гостей совпадает с количеством комнат, то выбираем это количество гостей
+          capacityValues[j].selected = true;
+        } else if (roomNumberValues[i].value === '100') { // отдельно сопоставляем 100 комнат с "не для гостей"
+          capacityValues[j].selected = true;
+        }
+      }
+    }
+  }
+};
+
+var setInvalidState = function (element) {
+  element.style.border = '3px solid #FF6347';
+};
+
+var setValidState = function (element) {
+  element.style.border = 'none';
+};
+
+var inputInvalidHandler = function (evt) {
+  if (evt.target.validity.valueMissing) {
+    evt.target.setCustomValidity('Пожалуйста, заполните поле');
+    setInvalidState(evt.target);
+  } else if (evt.target.validity.tooShort) {
+    evt.target.setCustomValidity('Минимум 30 символов');
+    setInvalidState(evt.target);
+  } else if (evt.target.validity.tooLong) {
+    evt.target.setCustomValidity('Максимум 100 символов');
+    setInvalidState(evt.target);
+  } else {
+    evt.target.setCustomValidity('');
+    setValidState(evt.target);
+  }
+};
+
 addCloseClickHandlers();
 deactivateMap();
 getActivePinAndPopup(pinButtons);
+syncCapacityWithRooms();
+
 mainPin.addEventListener('mouseup', activateMap);
+formType.addEventListener('change', formTypeChangeHandler);
+formTimeIn.addEventListener('change', formTimeChangeHandler);
+formRoomNumber.addEventListener('change', syncCapacityWithRooms);
+formTitle.addEventListener('invalid', inputInvalidHandler);
+formPrice.addEventListener('invalid', inputInvalidHandler);
