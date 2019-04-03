@@ -19,6 +19,9 @@
   var mapFiltersForm = document.querySelector('.map__filters');
   var mapFilters = mapFiltersForm.querySelectorAll('.map__filter');
   var toggledFormElements = [formElements, mapFilters, formHeader];
+  var MAIN_PIN_Y_OFFSET = 16;
+  var MIN_PIN_Y_COORD = 100 + MAIN_PIN_Y_OFFSET;
+  var MAX_PIN_Y_COORD = 500 + MAIN_PIN_Y_OFFSET;
 
   // синхронизация времени чекина с чекаутом
   var formTimeChangeHandler = function () {
@@ -63,13 +66,69 @@
 
   // определение позиции главного пина
   var getMainPinLocation = function () {
-    var MAIN_PIN_Y_OFFSET = 16;
     var mainPinLocationY = parseInt(getComputedStyle(mainPin).getPropertyValue('top'), 10) - MAIN_PIN_Y_OFFSET;
     var mainPinLocationX = parseInt(getComputedStyle(mainPin).getPropertyValue('left'), 10);
     return 'x: ' + mainPinLocationX + ', y: ' + mainPinLocationY;
   };
 
+  // перетаскивание главного пина с установкой координат в адресе формы
+  var mainPinMoveHandler = function (evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var mouseMoveHandler = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
+
+      var setNewCoords = function (isHorizontal) {
+        var result = mainPin.offsetTop - shift.y;
+        if (isHorizontal) {
+          result = mainPin.offsetLeft - shift.x;
+        }
+        return result;
+      };
+
+      var setXCoordsInRange = function (minCoord, maxCoord) {
+        var result = setNewCoords();
+        if (result > maxCoord) {
+          result = maxCoord;
+        }
+        if (result < minCoord) {
+          result = minCoord;
+        }
+        return result;
+      };
+
+      mainPin.style.top = setXCoordsInRange(MIN_PIN_Y_COORD, MAX_PIN_Y_COORD) + 'px';
+      mainPin.style.left = setNewCoords(true) + 'px';
+    };
+
+    var mouseUpHandler = function (upEvt) {
+      upEvt.preventDefault();
+      setDefaultAddress();
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  };
+
   syncCapacityWithRooms();
+  mainPin.addEventListener('mousedown', mainPinMoveHandler);
   formType.addEventListener('change', formTypeChangeHandler);
   formTimeIn.addEventListener('change', formTimeChangeHandler);
   formRoomNumber.addEventListener('change', syncCapacityWithRooms);
