@@ -50,6 +50,7 @@
   var activateMap = function () {
     map.classList.remove('map--faded');
     window.form.noticeForm.classList.remove('notice__form--disabled');
+    window.form.setDefaultCapacity();
     pinButtons.forEach(function (pinButton) {
       pinButton.classList.remove('hidden');
     });
@@ -63,25 +64,6 @@
   var cleanPins = function () {
     pinButtons.forEach(function (pinButton) {
       pinButton.classList.remove('map__pin--active');
-    });
-  };
-
-  // показ попапа с карточкой по клику или нажатию на пин
-  var showPopup = function (targetElement) {
-    var target = targetElement;
-
-    cardsPopups.forEach(function (popupElement) {
-      popupElement.classList.add('hidden');
-      if (targetElement.firstChild) {
-        target = targetElement.firstChild;
-      }
-
-      var cardImageSrc = popupElement.firstElementChild.src.substring(popupElement.firstElementChild.src.length - 10);
-      var pinImageSrc = target.src.substring(target.src.length - 10);
-
-      if (cardImageSrc === pinImageSrc) {
-        popupElement.classList.remove('hidden');
-      }
     });
   };
 
@@ -111,7 +93,7 @@
       target = target.firstChild;
     }
     target.parentNode.classList.add('map__pin--active'); // ..чтобы при любом событии задать класс родителю
-    showPopup(target);
+    window.showCard(target, cardsPopups);
     document.addEventListener('keydown', escPressHandler);
   };
 
@@ -139,5 +121,6 @@
   addClosePopupButtonClickHandlers();
   deactivateMap();
   addClickListenersToPins(pinButtons);
+
   window.form.mainPin.addEventListener('mouseup', activateMap);
 })();

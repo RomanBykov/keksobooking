@@ -35,11 +35,45 @@
     }
   };
 
+  // синхронизация выбранных полей в форме
+  var syncValues = function (elementOut, resultValue) {
+    elementOut.value = resultValue;
+  };
+
+  // синхронизация выбранных полей в форме
+  var syncValueWithMin = function (elementOut, resultValue) {
+    elementOut.min = resultValue;
+    elementOut.placeholder = resultValue;
+  };
+
+  // извлечение value из массива option
+  var getValuesFromOptionsAndSort = function (arr, callback) {
+    for (var i = 0; i < arr.length; i++) {
+      arr[i] = arr[i].value;
+    }
+
+    if (typeof callback === 'function') {
+      callback(arr);
+    }
+  };
+
+  // сортировка чисел по возрастанию с 0 в конце результата
+  var sortWithLastZero = function (arr) {
+    arr.sort(function (a, b) {
+      return a - b;
+    });
+    return arr.push(arr.shift());
+  };
+
   window.util = {
     getRandomNumber: getRandomNumber,
     getRandomFeatures: getRandomFeatures,
     isElementsInvisible: isElementsInvisible,
     ESC_KEY: ESC_KEY,
-    ENTER_KEY: ENTER_KEY
+    ENTER_KEY: ENTER_KEY,
+    syncValues: syncValues,
+    syncValueWithMin: syncValueWithMin,
+    getValuesFromOptionsAndSort: getValuesFromOptionsAndSort,
+    sortWithLastZero: sortWithLastZero
   };
 })();
