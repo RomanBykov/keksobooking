@@ -9,13 +9,12 @@
   var formTimeOut = noticeForm.querySelector('#timeout');
   var formTitle = noticeForm.querySelector('#title');
   var formType = noticeForm.querySelector('#type');
-  var formTypeOptions = Array.from(formType.querySelectorAll('option'));
   var formPrice = noticeForm.querySelector('#price');
   var formRoomNumber = noticeForm.querySelector('#room_number');
-  // var formCapacity = noticeForm.querySelector('#capacity');
+  var formCapacity = noticeForm.querySelector('#capacity');
   var formAddress = noticeForm.querySelector('#address');
-  var roomNumberValues = Array.from(noticeForm.querySelectorAll('#room_number option'));
-  var capacityValues = Array.from(noticeForm.querySelectorAll('#capacity option'));
+  var roomNumberValues = Array.from(formRoomNumber.querySelectorAll('option'));
+  var capacityValues = Array.from(formCapacity.querySelectorAll('option'));
   var mapFiltersForm = document.querySelector('.map__filters');
   var mapFilters = mapFiltersForm.querySelectorAll('.map__filter');
   var toggledFormElements = [formElements, mapFilters, formHeader];
@@ -23,43 +22,17 @@
   var MIN_PIN_Y_COORD = 100 + MAIN_PIN_Y_OFFSET;
   var MAX_PIN_Y_COORD = 500 + MAIN_PIN_Y_OFFSET;
 
-  // синхронизация времени чекина с чекаутом
-  var formTimeChangeHandler = function () {
-    formTimeOut.value = formTimeIn.value;
-  };
-
   // установка адреса по умолчанию
   var setDefaultAddress = function () {
     formAddress.value = getMainPinLocation();
     formAddress.placeholder = getMainPinLocation();
   };
 
-  // установка цены и её плейсхолдера
-  var changeFormPrice = function (price) {
-    formPrice.min = price;
-    formPrice.placeholder = price;
-  };
-
-  // синхронизация цены и её плейсхолдера с типом жилья
-  var formTypeChangeHandler = function () {
-    for (var i = 0; i < formTypeOptions.length; i++) {
-      if (formTypeOptions[i].selected) {
-        changeFormPrice(window.data.prices[i]);
-      }
-    }
-  };
-
-  // синхронизация количества комнат с количеством гостей
-  var syncCapacityWithRooms = function () {
-    for (var i = 0; i < roomNumberValues.length; i++) { // в цикле по комнатам находим выбранное количество комнат
+  // установка вместимости по умолчанию
+  var setDefaultCapacity = function () {
+    for (var i = 0; i < roomNumberValues.length; i++) {
       if (roomNumberValues[i].selected) {
-        for (var j = 0; j < capacityValues.length; j++) { // в цикле по количествам гостей на комнаты проверяем совпадения с комнатами
-          if (capacityValues[j].value === roomNumberValues[i].value) { // если значение количества гостей совпадает с количеством комнат, то выбираем это количество гостей
-            capacityValues[j].selected = true;
-          } else if (roomNumberValues[i].value === '100') { // отдельно сопоставляем 100 комнат с "не для гостей"
-            capacityValues[j].selected = true;
-          }
-        }
+        window.util.syncValues(formCapacity, capacityValues[i]);
       }
     }
   };
@@ -127,11 +100,12 @@
     document.addEventListener('mouseup', mouseUpHandler);
   };
 
-  syncCapacityWithRooms();
+  window.util.getValuesFromOptionsAndSort(capacityValues, window.util.sortWithLastZero);
+  window.synchronizeFields(formTimeIn, formTimeOut, window.data.CHECKS_TIMES, window.data.CHECKS_TIMES, window.util.syncValues);
+  window.synchronizeFields(formType, formPrice, Object.keys(window.data.HOUSING_TYPES), window.data.PRICES, window.util.syncValueWithMin);
+  window.synchronizeFields(formRoomNumber, formCapacity, roomNumberValues, capacityValues, window.util.syncValues);
+
   mainPin.addEventListener('mousedown', mainPinMoveHandler);
-  formType.addEventListener('change', formTypeChangeHandler);
-  formTimeIn.addEventListener('change', formTimeChangeHandler);
-  formRoomNumber.addEventListener('change', syncCapacityWithRooms);
   formTitle.addEventListener('invalid', window.validation.inputInvalidHandler);
   formPrice.addEventListener('invalid', window.validation.inputInvalidHandler);
 
@@ -139,7 +113,7 @@
     noticeForm: noticeForm,
     toggledFormElements: toggledFormElements,
     setDefaultAddress: setDefaultAddress,
-    syncCapacityWithRooms: syncCapacityWithRooms,
-    mainPin: mainPin
+    mainPin: mainPin,
+    setDefaultCapacity: setDefaultCapacity
   };
 })();

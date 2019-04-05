@@ -7,7 +7,8 @@
   var HOUSING_TYPES = {
     flat: 'Квартира',
     house: 'Дом',
-    bungalo: 'Бунгало'
+    bungalo: 'Бунгало',
+    palace: 'Дворец'
   };
   var MIN_PRICE = 1000;
   var MAX_PRICE = 1000000;
@@ -15,7 +16,7 @@
   var MAX_ROOMS = 5;
   var MIN_GUESTS = 1;
   var MAX_GUESTS = 10;
-  var prices = [1000, 0, 5000, 10000];
+  var PRICES = [1000, 0, 5000, 10000];
 
   // получение типов жилья в карточках
   var getOfferType = function (type) {
@@ -60,7 +61,8 @@
 
   window.data = {
     createCards: createCards,
-    prices: prices,
-    HOUSING_TYPES: HOUSING_TYPES
+    PRICES: PRICES,
+    HOUSING_TYPES: HOUSING_TYPES,
+    CHECKS_TIMES: CHECKS_TIMES
   };
 })();
