@@ -10,6 +10,7 @@
     pinElement.style.left = card.location.x + 'px';
     pinElement.style.top = card.location.y + 'px';
     pinElement.querySelector('.map__pin img').src = card.author.avatar;
+    pinElement.classList.add('hidden');
 
     return pinElement;
   };

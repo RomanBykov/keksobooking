@@ -44,6 +44,7 @@
   var syncValueWithMin = function (elementOut, resultValue) {
     elementOut.min = resultValue;
     elementOut.placeholder = resultValue;
+    elementOut.value = resultValue;
   };
 
   // извлечение value из массива option
