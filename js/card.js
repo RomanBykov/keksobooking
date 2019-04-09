@@ -40,11 +40,21 @@
       featuresList.removeChild(featuresList.firstChild);
     }
 
+    // var getType = function (type) {
+    //   var resultType = '';
+    //   for (var j = 0; j < Object.keys(window.data.HOUSING_TYPES).length; j++) {
+    //     if (type === Object.keys(window.data.HOUSING_TYPES[j])) {
+    //       resultType = Object.values(window.data.HOUSING_TYPES[j]);
+    //     }
+    //   }
+    //   return resultType;
+    // };
+
     cardElement.querySelector('img').src = card.author.avatar;
     cardElement.querySelector('h3').textContent = card.offer.title;
     cardElement.querySelector('p').textContent = card.offer.address;
     cardElement.querySelector('.popup__price').textContent = card.offer.price + ' ₽/ночь';
-    cardElement.querySelector('h4').textContent = card.offer.type;
+    cardElement.querySelector('h4').textContent = window.data.HOUSING_TYPES[card.offer.type];
     cardElement.querySelector('p:nth-of-type(3)').textContent = getRoomsEnding(card.offer.rooms) + ' для ' + getGuestsEnding(card.offer.guests);
     cardElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
     cardElement.querySelector('.popup__features').appendChild(fragment);
