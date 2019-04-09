@@ -18,16 +18,6 @@
     return mapPins.appendChild(fragment);
   };
 
-  // скрытие пинов и формы, получение данных пинов и карточек объявлений с сервера
-  var deactivateMap = function () {
-    window.backend.load(insertCardElements, window.backend.errorHandler);
-    map.classList.add('map--faded');
-    window.form.noticeForm.classList.add('notice__form--disabled');
-    window.form.toggledFormElements.forEach(function (element) {
-      window.util.isElementsInvisible(element, true);
-    });
-  };
-
   // после загрузки с сервера находим пины, карточки объявлений и кнопки закрытия карточек
   var findLoadedPinsAndCards = function () {
     pinButtons = Array.from(mapPins.querySelectorAll('.map__pin:not(.map__pin--main)'));
@@ -45,41 +35,38 @@
     addClosePopupButtonClickHandlers();
   };
 
-  // var observerCallback = function (allmutations) {
-  //   allmutations.map(function (mr) {
-  //     var mt = mr.target;
+  // одновременный поиск и показ пинов с добавлением событий
+  var findAndShowPins = function () {
+    findLoadedPinsAndCards();
+    showPinsAndAddClickListeners();
+  };
 
-  //     if (mt.classList.contains('map__pins')) {
-  //       // console.log(mt);
-  //       findLoadedPinsAndCards();
-  //       showPinsAndAddClickListeners();
-  //       // addClickListenersToPins(pinButtons);
-  //       // addClosePopupButtonClickHandlers();
-  //     }
-  //   });
-  // };
+  var setObserver = function () {
+    /* наблюдатель за изменениями в map__pins, которые происходят после загрузки данных с сервера,
+     чтобы затем работать с этими данными */
+    var observer = new MutationObserver(findAndShowPins); // объект наблюдатель с колбэком
+    // конфигурация наблюдаемых изменений
+    var config = {
+      childList: true
+    };
+    // старт наблюдения
+    observer.observe(mapPins, config);
+  };
 
+  // скрытие пинов и формы, получение данных пинов и карточек объявлений с сервера
+  var deactivateMap = function () {
+    map.classList.add('map--faded');
+    window.form.noticeForm.classList.add('notice__form--disabled');
+    window.form.toggledFormElements.forEach(function (element) {
+      window.util.isElementsInvisible(element, true);
+    });
+  };
 
   // показ пинов и формы
   var activateMap = function () {
-
-    var observer = new MutationObserver(function (/*mutations*/) {
-      // mutations.forEach(function (mutation) {
-        // if (mutation.target.classList.contains('map__pins')) {
-          findLoadedPinsAndCards();
-          showPinsAndAddClickListeners();
-        // }
-      // });
-    });
-
-    var config = {
-      'childList': true,
-      'subtree': true,
-      'characterData': true
-    };
-
-    observer.observe(document.body, config);
-    // showPinsAndAddClickListeners();
+    // загрузка данных объявлений с сервера
+    window.backend.load(insertCardElements, window.backend.errorHandler);
+    // отрытие карты и формы
     map.classList.remove('map--faded');
     window.form.noticeForm.classList.remove('notice__form--disabled');
     // активируем форму и фильтры
@@ -121,8 +108,8 @@
   var pinClickHandler = function (evt) {
     var target = evt.target;
     cleanPins();
-    if (target.firstChild) { // ..если событие сработало на button (родителе), то у элемента есть чайлд, и таргет становится этим чайлдом..
-      target = target.firstChild;
+    if (target.firstChild) { // ..если событие сработало на button (родителе),
+      target = target.firstChild; // то значит у элемента есть чайлд, и таргет становится этим чайлдом..
     }
     target.parentNode.classList.add('map__pin--active'); // ..чтобы при любом событии задать класс родителю
     window.showCard(target, cardsPopups);
@@ -150,12 +137,9 @@
     }
   };
 
-  // var observeHandler = function () {
-  //   observer.observe(mapPins, config);
-  //   activateMap();
-  // };
-
-  // первым делом деактивируем карту и форму с фильтрами, загрузим с сервера данные и затем добавим событие на клик по главному пину
+  /* первым делом деактивируем карту и форму с фильтрами, добавим наблюдателя,
+    добавим событие на клик по главному пину и по этому событию загрузим с данные сервера */
   deactivateMap();
+  setObserver();
   window.form.mainPin.addEventListener('mouseup', activateMap);
 })();
