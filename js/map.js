@@ -18,7 +18,7 @@
     return mapPins.appendChild(fragment);
   };
 
-  // скрытие пинов и формы
+  // скрытие пинов и формы, получение данных пинов и карточек объявлений с сервера
   var deactivateMap = function () {
     window.backend.load(insertCardElements, window.backend.errorHandler);
     map.classList.add('map--faded');
@@ -28,28 +28,66 @@
     });
   };
 
-  // показ пинов и формы
-  var activateMap = function () {
-    // после загрузки с сервера находим пины, карточки объявлений и кнопки закрытия карточек
+  // после загрузки с сервера находим пины, карточки объявлений и кнопки закрытия карточек
+  var findLoadedPinsAndCards = function () {
     pinButtons = Array.from(mapPins.querySelectorAll('.map__pin:not(.map__pin--main)'));
     cardsPopups = Array.from(document.querySelectorAll('.popup'));
     closePopupButtons = Array.from(document.querySelectorAll('.popup__close'));
-    // открываем карту
-    map.classList.remove('map--faded');
-    window.form.noticeForm.classList.remove('notice__form--disabled');
-    // показываем все пины
+  };
+
+  // показываем все пины
+  var showPinsAndAddClickListeners = function () {
     pinButtons.forEach(function (pinButton) {
       pinButton.classList.remove('hidden');
     });
+    // добавляем события на пины и кнопки закрытия карточек
+    addClickListenersToPins(pinButtons);
+    addClosePopupButtonClickHandlers();
+  };
+
+  // var observerCallback = function (allmutations) {
+  //   allmutations.map(function (mr) {
+  //     var mt = mr.target;
+
+  //     if (mt.classList.contains('map__pins')) {
+  //       // console.log(mt);
+  //       findLoadedPinsAndCards();
+  //       showPinsAndAddClickListeners();
+  //       // addClickListenersToPins(pinButtons);
+  //       // addClosePopupButtonClickHandlers();
+  //     }
+  //   });
+  // };
+
+
+  // показ пинов и формы
+  var activateMap = function () {
+
+    var observer = new MutationObserver(function (/*mutations*/) {
+      // mutations.forEach(function (mutation) {
+        // if (mutation.target.classList.contains('map__pins')) {
+          findLoadedPinsAndCards();
+          showPinsAndAddClickListeners();
+        // }
+      // });
+    });
+
+    var config = {
+      'childList': true,
+      'subtree': true,
+      'characterData': true
+    };
+
+    observer.observe(document.body, config);
+    // showPinsAndAddClickListeners();
+    map.classList.remove('map--faded');
+    window.form.noticeForm.classList.remove('notice__form--disabled');
     // активируем форму и фильтры
     window.form.toggledFormElements.forEach(function (element) {
       window.util.isElementsInvisible(element, false);
     });
     // устанавливаем значения по умолчанию
     window.form.setDefaultCapacity();
-    // добавляем события на пины и кнопки закрытия карточек
-    addClickListenersToPins(pinButtons);
-    addClosePopupButtonClickHandlers();
     // снимаем событие активации карты с главного пина, т.к. оно должно срабатывать один раз
     window.form.mainPin.removeEventListener('mouseup', activateMap);
   };
@@ -112,7 +150,12 @@
     }
   };
 
-  // первым делом дактивируем карту и форму с фильтрами, затем добавляем событие на клик по главному пину
+  // var observeHandler = function () {
+  //   observer.observe(mapPins, config);
+  //   activateMap();
+  // };
+
+  // первым делом деактивируем карту и форму с фильтрами, загрузим с сервера данные и затем добавим событие на клик по главному пину
   deactivateMap();
   window.form.mainPin.addEventListener('mouseup', activateMap);
 })();

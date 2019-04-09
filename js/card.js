@@ -9,7 +9,7 @@
     var fragment = document.createDocumentFragment();
     var featuresList = cardElement.querySelector('.popup__features');
 
-    var getRoomsEnding = function (rooms) {
+    var getRoomsWordsEnding = function (rooms) {
       var roomsInString = ' комната';
       if (rooms > 1 && rooms < 5) {
         roomsInString = ' комнаты';
@@ -20,7 +20,7 @@
       return rooms + roomsInString;
     };
 
-    var getGuestsEnding = function (guests) {
+    var getGuestsWordsEnding = function (guests) {
       var guestsInString = ' гостя';
       if (guests > 1) {
         guestsInString = ' гостей';
@@ -55,7 +55,7 @@
     cardElement.querySelector('p').textContent = card.offer.address;
     cardElement.querySelector('.popup__price').textContent = card.offer.price + ' ₽/ночь';
     cardElement.querySelector('h4').textContent = window.data.HOUSING_TYPES[card.offer.type];
-    cardElement.querySelector('p:nth-of-type(3)').textContent = getRoomsEnding(card.offer.rooms) + ' для ' + getGuestsEnding(card.offer.guests);
+    cardElement.querySelector('p:nth-of-type(3)').textContent = getRoomsWordsEnding(card.offer.rooms) + ' для ' + getGuestsWordsEnding(card.offer.guests);
     cardElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
     cardElement.querySelector('.popup__features').appendChild(fragment);
     cardElement.querySelector('p:last-of-type').textContent = card.offer.description;

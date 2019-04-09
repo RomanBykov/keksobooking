@@ -138,17 +138,18 @@
     evt.preventDefault();
   };
 
-  // синхронизация полей формы
+  // сортировка значений вместимости комнат по возрастанию с нулём на конце, чтобы можно было синхронизировать со значениями количества комнат
   window.util.getValuesFromOptionsAndSort(capacityValues, window.util.sortWithLastZero);
-  window.synchronizeFields(formTimeIn, formTimeOut, window.data.CHECKS_TIMES, window.data.CHECKS_TIMES, window.util.syncValues);
-  window.synchronizeFields(formType, formPrice, Object.keys(window.data.HOUSING_TYPES), window.data.PRICES, window.util.syncValueWithMin);
-  window.synchronizeFields(formRoomNumber, formCapacity, roomNumberValues, capacityValues, window.util.syncValues);
+  // синхронизация полей формы
+  window.synchronizeFields(formRoomNumber, formCapacity, roomNumberValues, capacityValues, window.util.syncValues); // вместимость с количеством комнат
+  window.synchronizeFields(formTimeIn, formTimeOut, window.data.CHECKS_TIMES, window.data.CHECKS_TIMES, window.util.syncValues); // время чекинов
+  window.synchronizeFields(formType, formPrice, Object.keys(window.data.HOUSING_TYPES), window.data.PRICES, window.util.syncValueWithMin); // минимальная цена с типом жилья
 
   // добавление событий
   mainPin.addEventListener('mousedown', mainPinMoveHandler);
+  noticeForm.addEventListener('submit', formSubmitHandler);
   formTitle.addEventListener('invalid', window.validation.inputInvalidHandler);
   formPrice.addEventListener('invalid', window.validation.inputInvalidHandler);
-  noticeForm.addEventListener('submit', formSubmitHandler);
 
   window.form = {
     noticeForm: noticeForm,
