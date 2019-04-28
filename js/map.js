@@ -39,6 +39,42 @@
   var findAndShowPins = function () {
     findLoadedPinsAndCards();
     showPinsAndAddClickListeners();
+
+    // module7-task1 START
+    var housingTypes = document.querySelector('#housing-type');
+
+    var housingTypesMap = {
+      'bungalo' : 'Бунгало',
+      'flat' : 'Квартира',
+      'house' : 'Дом'
+    };
+
+    var hidePins = function (array) {
+      pinButtons.forEach(function (item) {
+        item.classList.add('hidden');
+      })
+      array.forEach(function (arrItem) {
+        arrItem.nextSibling.classList.remove('hidden');
+      });
+    };
+
+    housingTypes.addEventListener('change', function () {
+      if (housingTypes.value === 'any') {
+        pinButtons.forEach(function (item) {
+          item.classList.remove('hidden');
+        })
+      } else {
+        var housingTypeValue = housingTypesMap[housingTypes.value];
+
+        var filtered = cardsPopups.filter(function (item) {
+          return item.querySelector('h4').textContent === housingTypeValue;
+        });
+
+        hidePins(filtered);
+        // console.log(housingTypesMap[housingTypes.value] || 'any');
+      }
+    });
+    // module7-task1 END
   };
 
   var setObserver = function () {
