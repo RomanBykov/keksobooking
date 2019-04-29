@@ -4,7 +4,7 @@
   var cardTemplate = document.querySelector('template').content.querySelector('.map__card');
 
   // отрисовка карточек
-  var renderCard = function (card) {
+  window.renderCard = function (card) {
     var cardElement = cardTemplate.cloneNode(true);
     var fragment = document.createDocumentFragment();
     var featuresList = cardElement.querySelector('.popup__features');
@@ -40,16 +40,6 @@
       featuresList.removeChild(featuresList.firstChild);
     }
 
-    // var getType = function (type) {
-    //   var resultType = '';
-    //   for (var j = 0; j < Object.keys(window.data.HOUSING_TYPES).length; j++) {
-    //     if (type === Object.keys(window.data.HOUSING_TYPES[j])) {
-    //       resultType = Object.values(window.data.HOUSING_TYPES[j]);
-    //     }
-    //   }
-    //   return resultType;
-    // };
-
     cardElement.querySelector('img').src = card.author.avatar;
     cardElement.querySelector('h3').textContent = card.offer.title;
     cardElement.querySelector('p').textContent = card.offer.address;
@@ -62,9 +52,5 @@
     cardElement.classList.add('hidden');
 
     return cardElement;
-  };
-
-  window.card = {
-    renderCard: renderCard
   };
 })();
