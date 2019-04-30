@@ -2,24 +2,50 @@
 
 (function () {
   var map = document.querySelector('.map');
-
   var housingTypes = document.querySelector('#housing-type');
-  // var housingPrice = document.querySelector('#housing-price');
-  // var pinButtons = [];
-  // var cardsPopups = [];
-  // var closePopupButtons = [];
+  var housingPrice = document.querySelector('#housing-price');
+  var housingRooms = document.querySelector('#housing-rooms');
+  var housingGuests = document.querySelector('#housing-guests');
+  var housingFeatures = document.querySelector('#housing-features');
   var housingsData = [];
 
-  // Удаление пинов с карточками из ДОМ
-
+  var housingFeaturesList = Array.from(housingFeatures.querySelectorAll('input'));
+  console.log(housingFeaturesList);
 
   // Отображение отфильтированных предложений
   var updateCards = function () {
-    window.util.cleanDOMPins(window.showCard.pinButtons, window.showCard.cardsPopups);
+    window.showCard.cleanDOMPins();
 
     var filteredHousings = housingsData.filter(function (item) {
       return (item.offer.type === housingTypes.value || housingTypes.value === 'any');
     });
+
+    filteredHousings = filteredHousings.filter(function (item) {
+      var resultDiapozone;
+      if (housingPrice.value === 'middle') {
+        resultDiapozone = (item.offer.price >= 10000 && item.offer.price <= 50000);
+      } else if (housingPrice.value === 'low') {
+        resultDiapozone = (item.offer.price < 10000);
+      } else if (housingPrice.value === 'high') {
+        resultDiapozone = (item.offer.price > 50000);
+      } else {
+        resultDiapozone = true;
+      }
+      return resultDiapozone;
+    });
+
+    filteredHousings = filteredHousings.filter(function (item) {
+      return (item.offer.rooms === Number(housingRooms.value) || housingRooms.value === 'any');
+    });
+
+    filteredHousings = filteredHousings.filter(function (item) {
+      return (item.offer.rooms === Number(housingRooms.value) || housingRooms.value === 'any');
+    });
+
+    filteredHousings = filteredHousings.filter(function (item) {
+      return (item.offer.guests === Number(housingGuests.value) || housingGuests.value === 'any');
+    });
+
 
     window.render(filteredHousings);
   };
@@ -29,15 +55,6 @@
     housingsData = data;
     updateCards();
   };
-
-  // после загрузки с сервера находим пины, карточки объявлений и кнопки закрытия карточек
-  // var findLoadedPinsAndCards = function () {
-  //   pinButtons = Array.from(mapPins.querySelectorAll('.map__pin:not(.map__pin--main)'));
-  //   cardsPopups = Array.from(document.querySelectorAll('.popup'));
-  //   closePopupButtons = Array.from(document.querySelectorAll('.popup__close'));
-  // };
-
-
 
   // скрытие пинов и формы, получение данных пинов и карточек объявлений с сервера
   var deactivateMap = function () {
@@ -70,4 +87,7 @@
   deactivateMap();
   window.form.mainPin.addEventListener('mouseup', activateMap);
   housingTypes.addEventListener('change', updateCards);
+  housingPrice.addEventListener('change', updateCards);
+  housingRooms.addEventListener('change', updateCards);
+  housingGuests.addEventListener('change', updateCards);
 })();

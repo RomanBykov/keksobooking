@@ -66,15 +66,6 @@
     return arr.push(arr.shift());
   };
 
-  var cleanDOMPins = function (arrayOfPins, arrayOfCards) {
-    if (arrayOfPins.length > 0) {
-      for (var i = 0; i < arrayOfPins.length; i++) {
-        arrayOfPins[i].remove();
-        arrayOfCards[i].remove();
-      }
-    }
-  };
-
   window.util = {
     getRandomNumber: getRandomNumber,
     getRandomFeatures: getRandomFeatures,
@@ -84,7 +75,6 @@
     syncValues: syncValues,
     syncValueWithMin: syncValueWithMin,
     getValuesFromOptionsAndSort: getValuesFromOptionsAndSort,
-    sortWithLastZero: sortWithLastZero,
-    cleanDOMPins: cleanDOMPins
+    sortWithLastZero: sortWithLastZero
   };
 })();

@@ -86,6 +86,14 @@
     }
   };
 
+  var cleanDOMPins = function () {
+    if (pinButtons.length > 0) {
+      for (var i = 0; i < pinButtons.length; i++) {
+        pinButtons[i].remove();
+        cardsPopups[i].remove();
+      }
+    }
+  };
 
   window.setObserver(findAndShowPins, mapPins);
 
@@ -94,6 +102,7 @@
     pinButtons: pinButtons,
     cardsPopups: cardsPopups,
     closePopupButtons: closePopupButtons,
-    cleanPins: cleanPins
+    cleanPins: cleanPins,
+    cleanDOMPins: cleanDOMPins
   };
 })();
