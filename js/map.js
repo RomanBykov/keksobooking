@@ -10,6 +10,11 @@
   var housingsData = [];
 
   var housingFeaturesList = Array.from(housingFeatures.querySelectorAll('input'));
+
+  // var featuresFilters = housingFeaturesList.map(function(item) {
+  //   return item.id.substring(7);
+  // });
+
   console.log(housingFeaturesList);
 
   // Отображение отфильтированных предложений
@@ -39,14 +44,25 @@
     });
 
     filteredHousings = filteredHousings.filter(function (item) {
-      return (item.offer.rooms === Number(housingRooms.value) || housingRooms.value === 'any');
-    });
-
-    filteredHousings = filteredHousings.filter(function (item) {
       return (item.offer.guests === Number(housingGuests.value) || housingGuests.value === 'any');
     });
 
+      var featuresFilters = housingFeaturesList.map(function(item) {
+        return item.id.substring(7);
+      });
 
+      console.log(featuresFilters);
+
+      // filteredHousings = filteredHousings.filter(function (item) {
+      //   return (item.offer.features === featuresFilters);
+      // });
+    // for (var i = 0; i < filteredHousings.length; i++) {
+    //   if (filteredHousings[i].offer.features.contains('washer')) {
+    //     console.log(filteredHousings[i].offer.features);
+    //   }
+    // }
+
+    // console.log(filteredHousings);
     window.render(filteredHousings);
   };
 
